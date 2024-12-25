@@ -1,9 +1,12 @@
-
-export interface LanguageValue {
-    value: string
+export interface IvalueLanguage{
+    language: string 
+    label: string 
+    color: string 
+    value: string 
 }
-export interface LanguageInterface {
-    html: LanguageValue,
-    css: LanguageValue,
-    js: LanguageValue
+
+export interface ILanguageInterface{
+    html: IvalueLanguage
+   css: IvalueLanguage
+   js: IvalueLanguage
 }

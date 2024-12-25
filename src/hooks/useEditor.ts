@@ -1,86 +1,126 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LanguageInterface } from "@/interfaces/LanguageInterface";
+import { ILanguageInterface } from "@/interfaces/LanguageInterface";
 
 const useEditor = () => {
-  const [dataLanguange, setDataLanguange] = useState<LanguageInterface>({
+  const [dataLanguange, setDataLanguange] = useState<ILanguageInterface>({
     html: {
-      value: `
-    <h1></h1>
-    <p></p>
-    `,
+      language: "html",
+      label: "HTML",
+      color: "text-orange-600",
+      value: `<h1 data-time="100">Bem vindo ao ykCODE</h1>
+<p data-time="300">crie, edite e visualize seu código em tempo real</p>
+   <div>
+         <span data-time="300">feito com ❤️ por DanielRocha</span>
+        
+   </div>
+`,
     },
     css: {
-      value: `   body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f0f0;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-      h1 {
-        color: #1f1f1f;
-      }
-      p {
-        color: #2f2f2f;
-        font-size: 1.2rem;
-      }`,
+      language: "css",
+      label: "CSS",
+      color: "text-blue-600",
+      value: `body {
+font-family: Arial, sans-serif;
+background-color: #f0f0f0;
+margin: 0;
+padding: 0;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+gap: 20px;
+height: 100vh;
+}
+      
+h1 {
+color: #1F1F1F;
+}
+      
+p {
+color: #2f2f2f;
+ font-size: 1.2rem;
+}
+      
+div {
+display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+background-color: #1f1f1f;
+padding: 10px 50px;
+ border-radius: 20px;
+color: white;
+}
+      
+a {
+  color: #e93939;
+ }
+`,
     },
     js: {
-      value: `const title = "Bem vindo ao ykCODE!";
-const subtitle = "editor de código online";
-let index = 0;
+      language: "js",
+      label: "JS",
+      color: "text-yellow-600",
+      value: `let index = 0;
 
-const typeWriter = (element, text,speed) => {
-  let charIndex = 0; 
-  const typing = () => {
-    if (charIndex < text.length) {
-      element.innerHTML += text.charAt(charIndex);
-      charIndex++;
-      setTimeout(typing, speed);
-    }
-  };
-  typing();
-};
-
-const h1 = document.querySelector("h1");
-const p = document.querySelector("p");
-
-typeWriter(h1, title,100);
-typeWriter(p, subtitle,300);
-    `,
+      const typeWriter = (element, text) => {
+        element.innerHTML = "";
+        const speed = parseInt(h1.dataset.time);
+      
+        let charIndex = 0;
+        const typing = () => {
+          if (charIndex < text.length) {
+            element.innerHTML += text.charAt(charIndex);
+            charIndex++;
+            setTimeout(typing, speed, speed);
+          }
+        };
+        typing();
+      };
+      
+      const h1 = document.querySelector("h1");
+      const p = document.querySelector("p");
+      const span = document.querySelector("span");
+      const a = document.querySelector("a");
+      
+      typeWriter(h1, h1.innerHTML);
+      typeWriter(p, p.innerHTML);
+      typeWriter(span, span.innerHTML)
+      typeWriter(a, a.innerHTML)`,
     },
   });
+
   const consoleRef = useRef<HTMLDivElement>(null);
   const [viewLanguange, SetviewLanguange] = useState<string>("html");
 
+  const [viewEdit, SetviewEdit] = useState<boolean>(false);
   const [consoleOutput, setConsoleOutput] = useState<string[]>([]);
   const [viewConsole, SetviewCOnsole] = useState<boolean>(false);
 
-  const redirectConsoleLog = () => {
+  const redirectConsoleLog = (
+    setOutput: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
     const originalLog = console.log;
 
     console.log = (...args) => {
-      setConsoleOutput((prev) => [...prev, args.join(" ")]);
+      setOutput((prev) => [...prev, args.join(" ")]);
       originalLog(...args);
     };
   };
 
-  const executeCode = () => {
+  const executeCode = (
+    dataLanguange: ILanguageInterface,
+    setOutput: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
     try {
-      redirectConsoleLog();
-      const userCode = dataLanguange.js.value;
-      eval(userCode);
+      redirectConsoleLog(setOutput);
+      const JsCode = dataLanguange.js.value;
+      eval(String(JsCode));
     } catch (error: unknown) {
       if (error instanceof Error) {
         setConsoleOutput((prev) => [...prev, `${error.message}`]);
-      } else {
-        setConsoleOutput((prev) => [...prev, "unknown error"]);
       }
     }
   };
@@ -89,7 +129,7 @@ typeWriter(p, subtitle,300);
     if (consoleRef.current) {
       consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
     }
-    executeCode();
+    executeCode(dataLanguange, setConsoleOutput);
   }, [dataLanguange]);
 
   const handleEditorChange = (newValue: string, language: string) => {
@@ -101,6 +141,10 @@ typeWriter(p, subtitle,300);
     }
   };
 
+  const handleViewEdit = () => {
+    SetviewEdit(!viewEdit);
+  };
+
   return {
     consoleRef,
     dataLanguange,
@@ -108,9 +152,12 @@ typeWriter(p, subtitle,300);
     consoleOutput,
     SetviewLanguange,
     setConsoleOutput,
+    setDataLanguange,
     viewConsole,
     SetviewCOnsole,
     handleEditorChange,
+    handleViewEdit,
+    viewEdit,
   };
 };
 

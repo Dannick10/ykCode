@@ -2,59 +2,89 @@
 
 import Editor from "@/components/NoteEditor";
 import useEditor from "@/hooks/useEditor";
+import Console from "@/components/Console";
+import Preview from "@/components/Preview";
 
 export default function Home() {
   const {
     SetviewCOnsole,
     consoleOutput,
     setConsoleOutput,
+    setDataLanguange,
     dataLanguange,
     handleEditorChange,
     viewConsole,
     viewLanguange,
     SetviewLanguange,
     consoleRef,
+    handleViewEdit,
+    viewEdit,
   } = useEditor();
-
-  const compileCode = () => `
-  <html>
-  <head>
-    <style>${dataLanguange.css.value}</style>
-  </head>
-  <body>
-    ${dataLanguange.html.value}
-  </body>
-  <script>${dataLanguange.js.value}</script>
-</html>
-`;
 
   return (
     <div className="codepen-clone flex flex-col h-screen">
-      <div className="w-full flex gap-4">
-        {[
-          { lang: "html", label: "HTML", color: "text-orange-600" },
-          { lang: "css", label: "CSS", color: "text-blue-600" },
-          { lang: "js", label: "JS", color: "text-yellow-600" },
-        ].map(({ lang, label, color }) => (
-          <p
-            key={lang}
-            className={`${color} cursor-pointer transition-all ${
-              viewLanguange === lang
-                ? "bg-white rounded-md px-2 min-w-16 text-center"
-                : ""
-            }`}
-            onClick={() => SetviewLanguange(lang)}
+      <div className="w-full justify-between px-2 flex gap-4">
+        <div className="flex gap-4">
+          {[
+            { lang: "html", label: "HTML", color: "text-orange-600" },
+            { lang: "css", label: "CSS", color: "text-blue-600" },
+            { lang: "js", label: "JS", color: "text-yellow-600" },
+          ].map(({ lang, label, color }) => (
+            <p
+              key={lang}
+              className={`${color} cursor-pointer transition-all ${
+                viewLanguange === lang
+                  ? "bg-white rounded-md px-2 min-w-16 text-center flex justify-center items-center"
+                  : ""
+              }`}
+              onClick={() => SetviewLanguange(lang)}
+            >
+              {label}
+            </p>
+          ))}
+        </div>
+
+        <div className="relative">
+          <div
+            className="cursor-pointer px-4 py-2 rounded-md"
+            tabIndex={0}
+            onClick={() => handleViewEdit()}
           >
-            {label}
-          </p>
-        ))}
+            ...
+          </div>
+          {viewEdit && (
+            <div
+              className="absolute top-8 justify-start right-0  z-50 bg-white shadow-md rounded-md mt-2 transition-all"
+              onClick={() =>
+                setDataLanguange((prev) => ({
+                  ...prev,
+                  [viewLanguange]: { value: "" },
+                }))
+              }
+            >
+              <ul className="text-black min-w-[120px] text-center">
+                <li
+                  className="hover:bg-gray-200 cursor-pointer py-2"
+                  onClick={handleViewEdit}
+                >
+                  limpar{" "}
+                  {viewLanguange === "html"
+                    ? "HTML"
+                    : viewLanguange === "css"
+                    ? "CSS"
+                    : "JS"}
+                </li>
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="bg-[#0E0E0E] flex flex-wrap resize-y overflow-auto max-h-[300px]">
         {viewLanguange === "html" && (
           <Editor
             language="html"
-            value={dataLanguange.html.value}
+            value={String(dataLanguange.html.value)}
             SetLanguage={(value) => handleEditorChange(String(value), "html")}
             defaultValue=""
           />
@@ -62,7 +92,7 @@ export default function Home() {
         {viewLanguange === "css" && (
           <Editor
             language="css"
-            value={dataLanguange.css.value}
+            value={String(dataLanguange.css.value)}
             SetLanguage={(value) => handleEditorChange(String(value), "css")}
             defaultValue=""
           />
@@ -70,7 +100,7 @@ export default function Home() {
         {viewLanguange === "js" && (
           <Editor
             language="javascript"
-            value={dataLanguange.js.value}
+            value={String(dataLanguange.js.value)}
             SetLanguage={(value) => handleEditorChange(String(value), "js")}
             defaultValue=""
           />
@@ -79,44 +109,37 @@ export default function Home() {
 
       <div className="w-full flex-1 bg-[#0E0E0E] border-t-8 py-2 border-2 border-[#0A0A0A]">
         <div className="h-full relative flex ">
-          <iframe
-            id="preview"
-            sandbox="allow-scripts allow-same-origin"
-            srcDoc={compileCode()}
-            style={{ width: "100%", height: "100%" }}
-            className="flex flex-col"
-          />
+          <Preview dataLanguange={dataLanguange} />
         </div>
 
         <div
-          className={`flex flex-col justify-end items-center absolute bottom-0 left-0 bg-[#0A0A0A] transition-all rounded ${
-            viewConsole ? "fixed w-full" : ""
-          }`}
+          className={`flex flex-col justify-end items-center  bottom-0 left-0 bg-[#0A0A0A] transition-all rounded `}
         >
-          <div
-            className="text-sm  flex justify-between items-center w-full py-2 px-8">
+          <div className="text-sm  flex justify-between items-center w-full py-2 px-8">
             <div>
-              <button className="bg-blue-800 min-w-32 p-2 rounded-md"  onClick={() => SetviewCOnsole(!viewConsole)}>Console</button>
-            </div>
-            {viewConsole && (
               <button
-                className="bg-red-800 p-2 rounded-md"
-                onClick={() => setConsoleOutput([])}
+                className="bg-blue-800 min-w-32 p-2 rounded-md"
+                onClick={() => {
+                  SetviewCOnsole(!viewConsole);
+                }}
               >
-                Limpar console
+                Console
               </button>
-            )}
+            </div>
+            <div className="flex gap-4">
+              {viewConsole && (
+                <button
+                  className="bg-red-800 p-2 rounded-md"
+                  onClick={() => setConsoleOutput([])}
+                >
+                  Limpar console
+                </button>
+              )}
+            </div>
           </div>
 
           {viewConsole && (
-            <div
-              ref={consoleRef}
-              className="transition-all w-full z-10 bottom-0 bg-[#2222] text-white p-4 pb-8 h-32 overflow-y-auto flex flex-col"
-            >
-              {consoleOutput.map((line, index) => (
-                <div key={index}>{line}</div>
-              ))}
-            </div>
+            <Console consoleRef={consoleRef} consoleOutput={consoleOutput} />
           )}
         </div>
       </div>
