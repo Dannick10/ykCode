@@ -113,7 +113,7 @@ export default function Home() {
         </div>
 
         <div
-          className={`flex flex-col justify-end items-center  bottom-0 left-0 bg-[#0A0A0A] transition-all rounded `}
+          className={`flex flex-col justify-end items-center  bottom-0 left-0 bg-[#0A0A0A] transition-all rounded  ${viewConsole && "fixed w-full bottom-0"}`}
         >
           <div className="text-sm  flex justify-between items-center w-full py-2 px-8">
             <div>
