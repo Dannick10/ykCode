@@ -9,10 +9,10 @@ const useEditor = () => {
       language: "html",
       label: "HTML",
       color: "text-orange-600",
-      value: `<h1 data-time="100">Bem vindo ao ykCODE</h1>
-<p data-time="300">crie, edite e visualize seu código em tempo real</p>
+      value: `<h1 data-time="50">Bem vindo ao ykCODE</h1>
+<p data-time="100">crie, edite e visualize seu código em tempo real</p>
    <div>
-         <span data-time="300">feito com ❤️ por DanielRocha</span>
+         <span data-time="10">feito com ❤️ por DanielRocha</span>
         
    </div>
 `,
@@ -42,6 +42,21 @@ p {
 color: #2f2f2f;
  font-size: 1.2rem;
 }
+
+p:after{
+  content:"|";
+  opacity: 0;
+  animation: blink .5s infinite ;
+}
+
+@keyframes blink{
+  0%{
+    opacity: 1;
+  }
+  100%{
+    opacity: 0;
+  }
+}
       
 div {
 display: flex;
@@ -67,7 +82,7 @@ a {
 
       const typeWriter = (element, text) => {
         element.innerHTML = "";
-        const speed = parseInt(h1.dataset.time);
+        const speed = parseInt(element.dataset.time);
       
         let charIndex = 0;
         const typing = () => {
