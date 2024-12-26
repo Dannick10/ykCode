@@ -16,9 +16,12 @@ const Preview = ({dataLanguange}: Props) => {
   <body>
     ${dataLanguange.html.value}
   </body>
-  <script>${dataLanguange.js.value}</script>
+  <script>
+  const body = document.body
+  ${dataLanguange.js.value}
+  </script>
   </html>
-  `;
+  `
 
   return (
     <iframe

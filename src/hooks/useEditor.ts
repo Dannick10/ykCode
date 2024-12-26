@@ -151,7 +151,8 @@ a {
     if (newValue !== undefined) {
       setDataLanguange((prevState) => ({
         ...prevState,
-        [language]: { value: newValue },
+        [language]: { value: newValue.replace( /document\./g, 
+        'body').replace(/window\./g, 'body')},
       }));
     }
   };
